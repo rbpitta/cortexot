@@ -1,0 +1,99 @@
+name: cortexot
+
+services:
+  cortexot-timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: cortexot-timescaledb
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-cortexot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cortexot}
+      POSTGRES_DB: ${POSTGRES_DB:-cortexot}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - cortexot_pgdata:/var/lib/postgresql/data
+      - ./docker/timescaledb/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-cortexot} -d ${POSTGRES_DB:-cortexot}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  cortexot-ollama:
+    image: ollama/ollama:latest
+    container_name: cortexot-ollama
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - cortexot_ollama:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "ps"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  cortexot-backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: cortexot-backend
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cortexot}:${POSTGRES_PASSWORD:-cortexot}@cortexot-timescaledb:5432/${POSTGRES_DB:-cortexot}
+      OLLAMA_BASE_URL: http://cortexot-ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:3b}
+      MCP_BASE_URL: http://cortexot-mcp:8001
+      SIMULATOR_BASE_URL: http://cortexot-simulator:8080
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    depends_on:
+      cortexot-timescaledb:
+        condition: service_healthy
+      cortexot-mcp:
+        condition: service_healthy
+      cortexot-simulator:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  cortexot-mcp:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.mcp
+    container_name: cortexot-mcp
+    ports:
+      - "${MCP_PORT:-8001}:8001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  cortexot-simulator:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.simulator
+    container_name: cortexot-simulator
+    ports:
+      - "${SIMULATOR_HTTP_PORT:-8080}:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+volumes:
+  cortexot_pgdata:
+  cortexot_ollama:
