@@ -47,6 +47,8 @@ uvicorn app.main:app --reload --port 8000
 
 See `docs/architecture.md` (expanded in later phases).
 
+**Sprint 1 smoke test:** [`docs/sprint1_smoke_checklist.md`](docs/sprint1_smoke_checklist.md) (SCRUM-26).
+
 ## License
 
 TBD — internal PoC.
