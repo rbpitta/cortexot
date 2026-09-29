@@ -30,14 +30,18 @@ def require_integration():
 
 @pytest.mark.asyncio
 async def test_opcua_subscription_persists_measurement(require_integration) -> None:
-    from integrations.opcua.plant_subscriber import PlantSubscriber
+    from app.application.use_cases.persist_plant_sample import PersistPlantSample
+    from app.infrastructure.opcua.plant_subscriber import AsyncUaPlantSubscriber
+    from app.infrastructure.persistence.store import SqlAlchemyTelemetryPersistence
 
+    persist = PersistPlantSample(SqlAlchemyTelemetryPersistence())
     received: list[tuple[str, float | str]] = []
 
     async def on_sample(ts, equipment_id, tag_name, raw, unit):
         received.append((tag_name, raw))
+        await persist.execute(ts, equipment_id, tag_name, raw, unit)
 
-    sub = PlantSubscriber(OPCUA_ENDPOINT, on_sample)
+    sub = AsyncUaPlantSubscriber(OPCUA_ENDPOINT, on_sample)
     await sub.start(period_ms=1000)
     try:
         deadline = time.time() + 30

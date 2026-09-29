@@ -45,8 +45,11 @@ python -m venv .venv
 .venv\Scripts\activate   # Windows
 pip install -e ".[dev]"
 pytest
+python -m importlinter.cli lint-imports
 uvicorn app.main:app --reload --port 8000
 ```
+
+See [docs/development.md](docs/development.md) (Clean Architecture, import-linter, Snyk Code).
 
 ## Architecture (approved)
 

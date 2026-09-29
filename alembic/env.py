@@ -5,8 +5,8 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 from app.config import get_settings
-from models.db.base import Base
-from models.db import tables  # noqa: F401
+from app.infrastructure.persistence.base import Base
+import app.infrastructure.persistence.tables  # noqa: F401
 
 config = context.config
 if config.config_file_name is not None:

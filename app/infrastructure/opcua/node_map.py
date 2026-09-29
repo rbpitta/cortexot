@@ -2,7 +2,12 @@
 
 from dataclasses import dataclass
 
-from simulator.plant_tags import EQUIPMENT_ID, NAMESPACE_URI, OPERATING_STATE_TAG, PLANT_TAGS
+from cortexot_plant.plant_tags import (
+    EQUIPMENT_ID,
+    NAMESPACE_URI,
+    OPERATING_STATE_TAG,
+    PLANT_TAGS,
+)
 
 
 @dataclass(frozen=True)

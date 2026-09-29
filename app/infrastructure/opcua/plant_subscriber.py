@@ -8,8 +8,12 @@ from typing import Any
 from asyncua import Client, Node
 from asyncua.common.subscription import DataChangeNotif
 
-from integrations.opcua.client import connect_client, disconnect_client
-from integrations.opcua.node_map import MappedTag, plant_tags_for_equipment, resolve_namespace_index
+from app.infrastructure.opcua.client import connect_client, disconnect_client
+from app.infrastructure.opcua.node_map import (
+    MappedTag,
+    plant_tags_for_equipment,
+    resolve_namespace_index,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +39,9 @@ class _PlantHandler:
         await self._on_sample(ts, tag.equipment_id, tag.tag_name, val, tag.unit)
 
 
-async def _resolve_plant_nodes(client: Client, ns_idx: int) -> tuple[list[Node], dict[str, MappedTag]]:
+async def _resolve_plant_nodes(
+    client: Client, ns_idx: int
+) -> tuple[list[Node], dict[str, MappedTag]]:
     objects = client.nodes.objects
     plant = await objects.get_child(f"{ns_idx}:Plant")
     pump = await plant.get_child(f"{ns_idx}:PUMP-01")
@@ -48,7 +54,7 @@ async def _resolve_plant_nodes(client: Client, ns_idx: int) -> tuple[list[Node],
     return nodes, node_to_tag
 
 
-class PlantSubscriber:
+class AsyncUaPlantSubscriber:
     def __init__(self, endpoint: str, on_sample: SampleCallback) -> None:
         self._endpoint = endpoint
         self._on_sample = on_sample

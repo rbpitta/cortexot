@@ -3,6 +3,8 @@
 **Product:** CortexOT — Industrial AI Advisor  
 **Repository:** `cortexot`
 
+**Backend code structure:** [clean_architecture.md](clean_architecture.md) (layers, SOLID, Snyk Code).
+
 Phase 0 establishes containers and health checks only. The approved target architecture:
 
 1. `cortexot-simulator` exposes OPC-UA `/Plant/*` and `/AI/*` (Phase 1+).

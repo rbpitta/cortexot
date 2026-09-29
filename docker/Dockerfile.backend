@@ -12,8 +12,7 @@ RUN apt-get update \
 
 COPY pyproject.toml README.md alembic.ini ./
 COPY app ./app
-COPY integrations ./integrations
-COPY models ./models
+COPY cortexot_plant ./cortexot_plant
 COPY alembic ./alembic
 COPY simulator ./simulator
 

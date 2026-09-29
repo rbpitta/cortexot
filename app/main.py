@@ -3,11 +3,11 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.api.demo import router as demo_router
-from app.api.health import router as health_router
+from app.bootstrap import AppContainer, build_container
 from app.config import Settings, get_settings
 from app.db_migrate import run_migrations
-from app.workers.opcua_collector_worker import OpcUaCollectorWorker
+from app.presentation.api.demo import router as demo_router
+from app.presentation.api.health import router as health_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -16,16 +16,18 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def create_app(settings: Settings | None = None) -> FastAPI:
+def create_app(
+    settings: Settings | None = None,
+    container: AppContainer | None = None,
+) -> FastAPI:
     settings = settings or get_settings()
+    container = container or build_container(settings)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         if settings.run_db_migrations:
             run_migrations()
-        collector = OpcUaCollectorWorker(settings)
-        app.state.opcua_collector = collector
-        await collector.start()
+        await container.opcua_collector_worker.start()
         logger.info(
             "Starting %s (%s) env=%s",
             settings.app_name,
@@ -33,15 +35,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             settings.environment,
         )
         yield
-        await collector.stop()
+        await container.opcua_collector_worker.stop()
 
     app = FastAPI(
         title=settings.app_name,
-        version="0.2.0",
-        description="Headless Industrial AI Advisor — Phase 1 OPC-UA ingest",
+        version="0.3.0",
+        description="Headless Industrial AI Advisor — Clean Architecture backend",
         lifespan=lifespan,
     )
     app.state.settings = settings
+    app.state.container = container
     app.include_router(health_router)
     app.include_router(demo_router)
     return app

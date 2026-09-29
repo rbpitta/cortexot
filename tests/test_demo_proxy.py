@@ -1,43 +1,39 @@
-import httpx
-import pytest
 from fastapi.testclient import TestClient
 
+from app.application.use_cases.start_degradation_demo import StartDegradationDemo
+from app.bootstrap import AppContainer, build_container
 from app.config import Settings
 from app.main import create_app
 
 
-def test_degradation_start_proxies_to_simulator(monkeypatch) -> None:
-    captured: dict = {}
+class FakeSimulatorGateway:
+    def __init__(self) -> None:
+        self.last_scenario: str | None = None
 
-    async def mock_post(url: str, json: dict) -> httpx.Response:
-        captured["url"] = url
-        captured["json"] = json
-        return httpx.Response(200, json={"status": "started", "scenario": json["scenario"]})
+    async def start_degradation(self, scenario: str) -> dict:
+        self.last_scenario = scenario
+        return {"status": "started", "scenario": scenario}
 
-    class MockAsyncClient:
-        def __init__(self, *args, **kwargs) -> None:
-            pass
 
-        async def __aenter__(self):
-            return self
-
-        async def __aexit__(self, *args):
-            pass
-
-        async def post(self, url: str, json: dict) -> httpx.Response:
-            return await mock_post(url, json)
-
-    monkeypatch.setattr("app.api.demo.httpx.AsyncClient", MockAsyncClient)
-
+def test_degradation_start_uses_demo_use_case() -> None:
     settings = Settings(
         simulator_base_url="http://sim:8080",
         opcua_enabled=False,
         run_db_migrations=False,
     )
-    client = TestClient(create_app(settings=settings))
+    base = build_container(settings)
+    gateway = FakeSimulatorGateway()
+    container = AppContainer(
+        settings=settings,
+        persist_plant_sample=base.persist_plant_sample,
+        start_degradation_demo=StartDegradationDemo(gateway),
+        plant_telemetry=base.plant_telemetry,
+        opcua_collector_worker=base.opcua_collector_worker,
+    )
+    client = TestClient(create_app(settings=settings, container=container))
     response = client.post(
         "/api/v1/demo/degradation/start",
         json={"scenario": "bearing_degradation"},
     )
     assert response.status_code == 200
-    assert captured["url"] == "http://sim:8080/api/v1/demo/degradation/start"
+    assert gateway.last_scenario == "bearing_degradation"
