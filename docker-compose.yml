@@ -50,6 +50,9 @@ services:
       OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:3b}
       MCP_BASE_URL: http://cortexot-mcp:8001
       SIMULATOR_BASE_URL: http://cortexot-simulator:8080
+      OPCUA_ENDPOINT: opc.tcp://cortexot-simulator:4840/cortexot/simulator/
+      OPCUA_ENABLED: "true"
+      RUN_DB_MIGRATIONS: "true"
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     depends_on:
@@ -85,8 +88,11 @@ services:
       context: .
       dockerfile: docker/Dockerfile.simulator
     container_name: cortexot-simulator
+    environment:
+      OPCUA_ENDPOINT: opc.tcp://0.0.0.0:4840/cortexot/simulator/
     ports:
       - "${SIMULATOR_HTTP_PORT:-8080}:8080"
+      - "${SIMULATOR_OPCUA_PORT:-4840}:4840"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://127.0.0.1:8080/health"]
       interval: 10s

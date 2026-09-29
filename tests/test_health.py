@@ -16,7 +16,11 @@ def test_backend_liveness(client: TestClient) -> None:
 
 
 def test_backend_readiness_without_database(monkeypatch) -> None:
-    settings = Settings(database_url="postgresql://invalid:invalid@127.0.0.1:1/nodb")
+    settings = Settings(
+        database_url="postgresql://invalid:invalid@127.0.0.1:1/nodb",
+        opcua_enabled=False,
+        run_db_migrations=False,
+    )
     app = create_app(settings=settings)
     client = TestClient(app)
 
@@ -42,4 +46,4 @@ def test_simulator_placeholder_health() -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["service"] == "cortexot-simulator"
-    assert body["opcua"] == "not_configured"
+    assert body["opcua"] == "configured"

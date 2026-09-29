@@ -2,15 +2,15 @@
 
 Headless Industrial AI platform integrated with SCADA/supervisory systems via **OPC-UA** (primary). This repository is a Proof of Concept evolving toward a production-grade advisor: collect process data, detect anomalies, investigate with a local LLM (Ollama) and **Industrial MCP** tools, and publish structured recommendations back to SCADA for operator acceptance.
 
-**Phase 0** provides the Docker stack, FastAPI bootstrap, health checks, and placeholders only — no OPC-UA, agent, or MCP tools yet.
+**Phase 0** bootstrapped Docker, health checks, and placeholders. **Phase 1** adds OPC-UA plant telemetry (`/Plant/PUMP-01/*`), Timescale ingest, and a demo degradation scenario — still no LLM agent or real MCP tools.
 
-## Stack (Phase 0)
+## Stack
 
 | Service | Container name | Role |
 |---------|----------------|------|
 | Backend | `cortexot-backend` | FastAPI API, future collectors & agent |
 | Industrial MCP | `cortexot-mcp` | MCP tool layer (placeholder) |
-| Simulator | `cortexot-simulator` | Industrial simulator (placeholder) |
+| Simulator | `cortexot-simulator` | OPC-UA plant server + HTTP demo API |
 | TimescaleDB | `cortexot-timescaledb` | PostgreSQL + TimescaleDB |
 | Ollama | `cortexot-ollama` | Local LLM runtime |
 
@@ -25,8 +25,18 @@ Health endpoints:
 
 - Backend: http://localhost:8000/health and http://localhost:8000/ready
 - Industrial MCP: http://localhost:8001/health
-- Simulator: http://localhost:8080/health
+- Simulator: http://localhost:8080/health (OPC-UA `opc.tcp://localhost:4840/cortexot/simulator/`)
 - Ollama: http://localhost:11434/
+
+Phase 1 demo (after stack is up):
+
+```bash
+curl -X POST http://localhost:8000/api/v1/demo/degradation/start \
+  -H "Content-Type: application/json" \
+  -d "{\"scenario\":\"bearing_degradation\"}"
+```
+
+Measurements land in `cortexot.measurements` (Timescale hypertable). Connect pgAdmin to `localhost:5432` (user/db/password `cortexot`).
 
 ## Local development
 

@@ -10,6 +10,8 @@ def settings() -> Settings:
     return Settings(
         database_url="postgresql://test:test@localhost:5432/test",
         environment="test",
+        opcua_enabled=False,
+        run_db_migrations=False,
     )
 
 

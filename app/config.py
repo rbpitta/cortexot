@@ -4,12 +4,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        extra="ignore",
-    )
-
     app_name: str = "CortexOT — Industrial AI Advisor"
     service_name: str = "cortexot-backend"
     environment: str = "development"
@@ -25,6 +19,18 @@ class Settings(BaseSettings):
 
     mcp_base_url: str = "http://localhost:8001"
     simulator_base_url: str = "http://localhost:8080"
+
+    opcua_enabled: bool = True
+    opcua_endpoint: str = "opc.tcp://localhost:4840/cortexot/simulator/"
+    opcua_subscription_period_ms: int = 1000
+    run_db_migrations: bool = True
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+        populate_by_name=True,
+    )
 
 
 @lru_cache
