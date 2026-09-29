@@ -4,7 +4,7 @@ import asyncio
 import logging
 
 from app.config import Settings
-from app.domain.ports.telemetry import PlantTelemetryPort
+from app.domain.ports import PlantTelemetryPort
 
 logger = logging.getLogger(__name__)
 

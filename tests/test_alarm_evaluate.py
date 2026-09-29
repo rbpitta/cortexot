@@ -1,4 +1,4 @@
-from app.domain.alarming.evaluate import evaluate_threshold_alarms
+from app.domain.alarms import evaluate_threshold_alarms
 
 
 def test_evaluate_critical_temperature() -> None:

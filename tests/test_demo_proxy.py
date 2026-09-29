@@ -1,9 +1,9 @@
 from fastapi.testclient import TestClient
 
-from app.application.use_cases.start_degradation_demo import StartDegradationDemo
 from app.bootstrap import AppContainer, build_container
 from app.config import Settings
 from app.main import create_app
+from app.services.degradation_demo import StartDegradationDemo
 
 
 class FakeSimulatorGateway:
@@ -15,7 +15,7 @@ class FakeSimulatorGateway:
         return {"status": "started", "scenario": scenario}
 
 
-def test_degradation_start_uses_demo_use_case() -> None:
+def test_degradation_start_uses_demo_service() -> None:
     settings = Settings(
         simulator_base_url="http://sim:8080",
         opcua_enabled=False,

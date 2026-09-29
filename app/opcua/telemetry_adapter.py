@@ -1,11 +1,9 @@
-from app.application.use_cases.persist_plant_sample import PersistPlantSample
-from app.domain.ports.telemetry import PlantTelemetryPort
-from app.infrastructure.opcua.plant_subscriber import AsyncUaPlantSubscriber
+from app.domain.ports import PlantTelemetryPort
+from app.opcua.plant_subscriber import AsyncUaPlantSubscriber
+from app.services.persist_sample import PersistPlantSample
 
 
 class AsyncUaPlantTelemetryAdapter(PlantTelemetryPort):
-    """OPC-UA adapter: subscriptions invoke the persist use case."""
-
     def __init__(self, endpoint: str, persist_sample: PersistPlantSample) -> None:
         self._endpoint = endpoint
         self._persist_sample = persist_sample

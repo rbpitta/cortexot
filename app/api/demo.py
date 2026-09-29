@@ -11,9 +11,9 @@ class DegradationStartBody(BaseModel):
 
 @router.post("/degradation/start")
 async def start_degradation(request: Request, body: DegradationStartBody) -> dict:
-    use_case = request.app.state.container.start_degradation_demo
+    service = request.app.state.container.start_degradation_demo
     try:
-        return await use_case.execute(body.scenario)
+        return await service.execute(body.scenario)
     except httpx.HTTPStatusError as exc:
         raise HTTPException(status_code=exc.response.status_code, detail=exc.response.text) from exc
     except httpx.RequestError as exc:

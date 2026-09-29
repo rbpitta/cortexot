@@ -1,6 +1,6 @@
 import httpx
 
-from app.domain.ports.demo import SimulatorDemoGateway
+from app.domain.ports import SimulatorDemoGateway
 
 
 class HttpxSimulatorDemoGateway(SimulatorDemoGateway):

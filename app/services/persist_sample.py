@@ -1,11 +1,13 @@
 from datetime import datetime
 
-from app.domain.alarming.evaluate import evaluate_threshold_alarms
-from app.domain.ports.persistence import TelemetryPersistencePort
-from app.domain.telemetry.sample import PlantSampleInput
+from app.domain.alarms import evaluate_threshold_alarms
+from app.domain.ports import TelemetryPersistencePort
+from app.domain.samples import PlantSampleInput
 
 
 class PersistPlantSample:
+    """Save one plant tag reading and derived alarms."""
+
     def __init__(self, persistence: TelemetryPersistencePort) -> None:
         self._persistence = persistence
 

@@ -3,11 +3,11 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from app.api.demo import router as demo_router
+from app.api.health import router as health_router
 from app.bootstrap import AppContainer, build_container
 from app.config import Settings, get_settings
 from app.db_migrate import run_migrations
-from app.presentation.api.demo import router as demo_router
-from app.presentation.api.health import router as health_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -39,8 +39,8 @@ def create_app(
 
     app = FastAPI(
         title=settings.app_name,
-        version="0.3.0",
-        description="Headless Industrial AI Advisor — Clean Architecture backend",
+        version="0.3.1",
+        description="Headless Industrial AI Advisor",
         lifespan=lifespan,
     )
     app.state.settings = settings

@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 
-from app.application.use_cases.persist_plant_sample import PersistPlantSample
-from app.application.use_cases.start_degradation_demo import StartDegradationDemo
 from app.config import Settings
-from app.domain.ports.telemetry import PlantTelemetryPort
-from app.infrastructure.http.simulator_gateway import HttpxSimulatorDemoGateway
-from app.infrastructure.opcua.telemetry_adapter import AsyncUaPlantTelemetryAdapter
-from app.infrastructure.persistence.store import SqlAlchemyTelemetryPersistence
-from app.presentation.workers.opcua_collector_worker import OpcUaCollectorWorker
+from app.db.store import SqlAlchemyTelemetryPersistence
+from app.domain.ports import PlantTelemetryPort
+from app.opcua.telemetry_adapter import AsyncUaPlantTelemetryAdapter
+from app.services.degradation_demo import StartDegradationDemo
+from app.services.persist_sample import PersistPlantSample
+from app.simulator_client import HttpxSimulatorDemoGateway
+from app.workers.opcua_collector_worker import OpcUaCollectorWorker
 
 
 @dataclass

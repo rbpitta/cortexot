@@ -30,9 +30,9 @@ def require_integration():
 
 @pytest.mark.asyncio
 async def test_opcua_subscription_persists_measurement(require_integration) -> None:
-    from app.application.use_cases.persist_plant_sample import PersistPlantSample
-    from app.infrastructure.opcua.plant_subscriber import AsyncUaPlantSubscriber
-    from app.infrastructure.persistence.store import SqlAlchemyTelemetryPersistence
+    from app.db.store import SqlAlchemyTelemetryPersistence
+    from app.opcua.plant_subscriber import AsyncUaPlantSubscriber
+    from app.services.persist_sample import PersistPlantSample
 
     persist = PersistPlantSample(SqlAlchemyTelemetryPersistence())
     received: list[tuple[str, float | str]] = []

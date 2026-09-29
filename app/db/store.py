@@ -3,10 +3,10 @@ from datetime import UTC, datetime
 
 from sqlalchemy.dialects.postgresql import insert
 
-from app.domain.alarming.evaluate import AlarmDraft
-from app.domain.telemetry.sample import PlantSampleInput
-from app.infrastructure.persistence.session import get_session_factory
-from app.infrastructure.persistence.tables import Alarm, EquipmentState, Measurement
+from app.db.session import get_session_factory
+from app.db.tables import Alarm, EquipmentState, Measurement
+from app.domain.alarms import AlarmDraft
+from app.domain.samples import PlantSampleInput
 
 logger = logging.getLogger(__name__)
 

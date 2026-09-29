@@ -1,6 +1,6 @@
 [project]
 name = "cortexot"
-version = "0.3.0"
+version = "0.3.1"
 description = "CortexOT — Industrial AI Advisor"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -44,12 +44,14 @@ markers = [
 root_package = "app"
 
 [[tool.importlinter.contracts]]
-name = "Domain must not depend on outer layers"
+name = "Domain stays free of frameworks and adapters"
 type = "forbidden"
 source_modules = ["app.domain"]
 forbidden_modules = [
-    "app.infrastructure",
-    "app.presentation",
+    "app.db",
+    "app.opcua",
+    "app.api",
+    "app.workers",
     "simulator",
     "fastapi",
     "sqlalchemy",
@@ -58,12 +60,14 @@ forbidden_modules = [
 ]
 
 [[tool.importlinter.contracts]]
-name = "Application must not depend on adapters"
+name = "Services orchestrate domain only"
 type = "forbidden"
-source_modules = ["app.application"]
+source_modules = ["app.services"]
 forbidden_modules = [
-    "app.infrastructure",
-    "app.presentation",
+    "app.db",
+    "app.opcua",
+    "app.api",
+    "app.workers",
     "simulator",
     "fastapi",
     "sqlalchemy",

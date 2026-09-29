@@ -8,12 +8,8 @@ from typing import Any
 from asyncua import Client, Node
 from asyncua.common.subscription import DataChangeNotif
 
-from app.infrastructure.opcua.client import connect_client, disconnect_client
-from app.infrastructure.opcua.node_map import (
-    MappedTag,
-    plant_tags_for_equipment,
-    resolve_namespace_index,
-)
+from app.opcua.client import connect_client, disconnect_client
+from app.opcua.node_map import MappedTag, plant_tags_for_equipment, resolve_namespace_index
 
 logger = logging.getLogger(__name__)
 
